@@ -33,32 +33,47 @@ function Home() {
         //         autoClose: 5000,
         //     });
         // }
-        navigation.navigate('SurveyPage'); // Navigate to the 'SurveyPage'
+        navigation.navigate('SignupPage'); // Navigate to the 'SurveyPage'
 
     };
 
+    const loginhandle = () => {
+        navigation.navigate('Login');
+    }
+
+    const handlesurvey = () => {
+        navigation.navigate('SurveyPage');
+
+    }
+
     return (
-        <div>
-            <View style={styles.container}>
-                <Image source={bg1} style={styles.backgroundImage} />
 
-                <View style={styles.content}>
-                    <Text style={styles.brandText}>OWL BRAND</Text>
-                    <Text style={styles.projectText}>Barn Owl Pellet Data Project</Text>
+        <View style={styles.container}>
+            <Image source={bg1} style={styles.backgroundImage} />
 
-                    {/* {displayName && (
+            <View style={styles.content}>
+                <Text style={styles.brandText}>OWL BRAND</Text>
+                <Text style={styles.projectText}>Barn Owl Pellet Data Project</Text>
+
+                {/* {displayName && (
                         <Text style={styles.displayName}>Hi, {displayName}!</Text>
                     )} */}
 
-                    {/* Rest of your content */}
-                    <TouchableOpacity style={styles.button} onPress={handleStartSurveyClick}>
-                        Start Survey
-                    </TouchableOpacity>
+                {/* Rest of your content */}
+                <TouchableOpacity style={styles.button} onPress={handleStartSurveyClick}>
+                    <Text>Signup</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={loginhandle}>
+                    <Text>login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={handlesurvey}>
+                    <Text>Start Survey</Text>
+                </TouchableOpacity>
 
-                </View>
             </View>
+        </View>
 
-        </div>
+
     );
 }
 
@@ -71,6 +86,7 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
         justifyContent: 'center',
         alignItems: 'center',
+        width: "100%"
     },
     content: {
         position: 'absolute',

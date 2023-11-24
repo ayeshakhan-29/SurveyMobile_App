@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import bg1 from '../Images/blue.png'
 import { db } from '../Firebase/Firebase';
@@ -14,8 +14,8 @@ const SurveyPage = () => {
     const [questions, setQuestions] = useState([]);
     const [answers, setAnswers] = useState([]);
     const [responses, setResponses] = useState([]);
-    const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const [isSurveyStarted, setIsSurveyStarted] = useState(false);
+    // const [showErrorMessage, setShowErrorMessage] = useState(false);
+    // const [isSurveyStarted, setIsSurveyStarted] = useState(false);
 
     const collectionName = 'questions';
 
