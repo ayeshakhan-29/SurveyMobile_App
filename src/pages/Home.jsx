@@ -36,7 +36,7 @@ function Home() {
     return (
 
         <View style={styles.container}>
-            <Image source={bg1} style={styles.backgroundImage} />
+            {/* <Image source={bg1} style={styles.backgroundImage} /> */}
 
             <View style={styles.content}>
                 <Text style={styles.brandText}>OWL BRAND</Text>
@@ -59,51 +59,59 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    backgroundImage: {
-        flex: 1,
-        resizeMode: 'cover',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: "100%"
-    },
+    // backgroundImage: {
+    //     flex: 1,
+    //     resizeMode: 'cover',
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     width: "100%"
+    // },
     content: {
         position: 'absolute',
-        top: 10,
+        top: 0,
         left: 0,
         right: 0,
         bottom: 0,
         // justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#7895CB',
+
     },
     brandText: {
         fontSize: 48,
         fontWeight: 'bold',
         marginTop: 5,
         textAlign: 'center',
+        color: "white",
     },
     projectText: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginTop: 5,
+        marginTop: 10,
         textAlign: 'center',
+        color: "white",
     },
     projectText1: {
         fontSize: 14,
-        fontWeight: 'normal',
-        marginTop: 20,
+        fontWeight: '500',
+        marginTop: 40,
         textAlign: 'center',
+        color: "white",
+        marginHorizontal: 20,
+
     },
     displayName: {
         fontSize: 20,
         textAlign: 'center',
         marginTop: 4,
+        color: "white",
     },
     button: {
-        backgroundColor: 'blue', // Background color
+        backgroundColor: '#A0BFE0',
         paddingHorizontal: 20, // Horizontal padding
         paddingVertical: 10, // Vertical padding
         borderRadius: 8, // Border radius
-        marginTop: 20, // Top margin
+        marginTop: 40, // Top margin
     },
 
     buttonText: {

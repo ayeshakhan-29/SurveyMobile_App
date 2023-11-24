@@ -5,8 +5,10 @@ import Home from './src/pages/Home';
 import SurveyPage from './src/pages/SurveyPage';
 import Login from './src/pages/Login';
 import SignupScreen from './src/pages/Signup';
+import FirstPage from './src/pages/FirstPage'
 // import ToastManager, { Toast } from 'toastify-react-native'
 import Toast from 'react-native-toast-message';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -25,7 +27,7 @@ function App() {
         />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="SignupPage" component={SignupScreen} />
-        {/* <Stack.Screen name="ResultsPage" component={ResultsScreen} /> */}
+        <Stack.Screen name="FirstPage" component={FirstPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
