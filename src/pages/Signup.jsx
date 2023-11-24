@@ -44,6 +44,11 @@ const Signup = () => {
         }
     };
 
+    const handleLoginNavigation = () => {
+        navigation.navigate('Login');
+    };
+
+
     return (
         <View style={styles.container}>
             <View style={styles.signupContainer}>
@@ -71,6 +76,9 @@ const Signup = () => {
 
                 <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
                     <Text style={styles.buttonText}>Sign Up</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleLoginNavigation}>
+                    <Text style={styles.loginLink}>Already have an account? Login</Text>
                 </TouchableOpacity>
 
             </View>

@@ -1,50 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import bg1 from '../Images/blue.png';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook from React Navigation
 // import { toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
-import { signOut, getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 function Home() {
-    // const location = useLocation();
-    // const queryParams = new URLSearchParams(location.search);
-    // const displayName = queryParams.get('name');
-    const navigation = useNavigation(); // Initialize navigation object
-    // const auth = getAuth();
+    const [displayName, setDisplayName] = useState('');
+    const navigation = useNavigation();
 
-    // const handleLogout = () => {
-    //     signOut(auth)
-    //         .then(() => {
-    //             toast.success('Logged out successfully');
-    //             // navigate('/');
-    //         })
-    //         .catch((error) => {
-    //             toast.error('Error logging out');
-    //         });
-    // };
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in.
+                setDisplayName(user.displayName || '');
+            } else {
+                // No user is signed in.
+                setDisplayName('');
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     const handleStartSurveyClick = () => {
-        // if (displayName) {
-        //     // navigate('/SurveyPage');
-        // } else {
-        //     toast.error('Please log in to start the survey.', {
-        //         position: 'top-center',
-        //         autoClose: 5000,
-        //     });
-        // }
-        navigation.navigate('SignupPage'); // Navigate to the 'SurveyPage'
-
+        if (displayName) {
+            navigation.navigate('SurveyPage');
+        } else {
+            // Show error message or handle the case where the user is not logged in
+        }
     };
-
-    const loginhandle = () => {
-        navigation.navigate('Login');
-    }
-
-    const handlesurvey = () => {
-        navigation.navigate('SurveyPage');
-
-    }
 
     return (
 
@@ -54,24 +41,15 @@ function Home() {
             <View style={styles.content}>
                 <Text style={styles.brandText}>OWL BRAND</Text>
                 <Text style={styles.projectText}>Barn Owl Pellet Data Project</Text>
-
-                {/* {displayName && (
-                        <Text style={styles.displayName}>Hi, {displayName}!</Text>
-                    )} */}
-
-                {/* Rest of your content */}
+                {displayName ? (
+                    <Text style={styles.displayName}>Hi, {displayName}!</Text>
+                ) : null}
+                <Text style={styles.projectText1}>Together, we are gathering information about the unique and fascinating diet of the common barn owl. In this survey, you'll have the chance to record your findings after dissecting a barn owl pellet, including prey species and their bone and exoskeleton discoveries.</Text>
                 <TouchableOpacity style={styles.button} onPress={handleStartSurveyClick}>
-                    <Text>Signup</Text>
+                    <Text style={styles.buttonText}>Start Survey</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={loginhandle}>
-                    <Text>login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handlesurvey}>
-                    <Text>Start Survey</Text>
-                </TouchableOpacity>
-
             </View>
-        </View>
+        </View >
 
 
     );
@@ -90,22 +68,28 @@ const styles = StyleSheet.create({
     },
     content: {
         position: 'absolute',
-        top: 60,
+        top: 10,
         left: 0,
         right: 0,
         bottom: 0,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
     },
     brandText: {
         fontSize: 48,
         fontWeight: 'bold',
-        marginTop: 20,
+        marginTop: 5,
         textAlign: 'center',
     },
     projectText: {
         fontSize: 24,
         fontWeight: 'bold',
+        marginTop: 5,
+        textAlign: 'center',
+    },
+    projectText1: {
+        fontSize: 14,
+        fontWeight: 'normal',
         marginTop: 20,
         textAlign: 'center',
     },
@@ -115,11 +99,19 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     button: {
-        color: "blue",
-        borderColor: "blue",
+        backgroundColor: 'blue', // Background color
+        paddingHorizontal: 20, // Horizontal padding
+        paddingVertical: 10, // Vertical padding
+        borderRadius: 8, // Border radius
+        marginTop: 20, // Top margin
+    },
 
-    }
-    // Define other styles as needed for different elements
+    buttonText: {
+        color: 'white', // Text color
+        fontSize: 16, // Font size
+        fontWeight: 'bold', // Font weight
+        textAlign: 'center', // Text alignment
+    },
 });
 
 export default Home;
