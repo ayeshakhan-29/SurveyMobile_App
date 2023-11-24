@@ -5,9 +5,8 @@ import Home from './src/pages/Home';
 import SurveyPage from './src/pages/SurveyPage';
 import Login from './src/pages/Login';
 import SignupScreen from './src/pages/Signup';
-// import ResultsScreen from './Results';
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
+// import ToastManager, { Toast } from 'toastify-react-native'
+import Toast from 'react-native-toast-message';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,8 +16,7 @@ function App() {
 
   return (
     <NavigationContainer>
-      {/* <ToastContainer /> */}
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="SignupPage">
         <Stack.Screen name="Home" component={Home}/>
         <Stack.Screen
           name="SurveyPage" 

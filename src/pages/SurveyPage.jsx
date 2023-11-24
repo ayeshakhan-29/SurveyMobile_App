@@ -1,23 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import bg1 from '../Images/blue.png';
 import { getAuth } from 'firebase/auth';
-import bg1 from '../Images/blue.png'
 import { db } from '../Firebase/Firebase';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
+import Toast from 'react-native-toast-message';
 
 const SurveyPage = () => {
     const auth = getAuth(); // Initialize Firebase Auth
     const user = auth.currentUser; // Get the current authenticated user
+    // Use the appropriate navigation hook for React Native navigation
+    // For instance, if you're using React Navigation:
+    // const navigation = useNavigation();
 
     const [selectedItems, setSelectedItems] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
     const [questions, setQuestions] = useState([]);
     const [answers, setAnswers] = useState([]);
     const [responses, setResponses] = useState([]);
-    // const [showErrorMessage, setShowErrorMessage] = useState(false);
-    // const [isSurveyStarted, setIsSurveyStarted] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null); // Add this line
+
 
     const collectionName = 'questions';
+    const shouldConfirmExit = useRef(false);
+
+    useEffect(() => {
+        queryCollection();
+    }, []);
+
 
     const queryCollection = async () => {
         try {
@@ -27,28 +37,6 @@ const SurveyPage = () => {
             setAnswers(new Array(data.length).fill(''));
         } catch (error) {
             console.error('Error getting documents: ', error);
-        }
-    };
-
-    const handleNext = () => {
-        shouldConfirmExit.current = true;
-        if (currentStep < questions?.length - 1) {
-            if (
-                (questions[currentStep]?.type === 'checkbox' && selectedItems.length === 0) ||
-                (questions[currentStep]?.type !== 'checkbox' && !answers[currentStep])
-            ) {
-                toast.error('Please choose an option before proceeding.');
-            } else {
-                const updatedResponses = [...responses];
-                updatedResponses[currentStep] = {
-                    question: questions[currentStep]?.text,
-                    response: questions[currentStep]?.type === 'checkbox'
-                        ? selectedItems
-                        : answers[currentStep],
-                };
-                setResponses(updatedResponses);
-                setCurrentStep(currentStep + 1);
-            }
         }
     };
 
@@ -75,53 +63,74 @@ const SurveyPage = () => {
         try {
             const responseRef = collection(db, 'responses');
             await addDoc(responseRef, userData);
-
-            // Show a success toast message
-            toast.success('Survey submitted successfully!', {
-                onClose: () => {
-                    // Navigate to the home page after successful submission
-                    navigate('/');
-                },
-            });
+            console.log('Survey submitted successfully!');
 
             // You can also reset the state after saving
             setResponses([]);
             setAnswers(new Array(questions.length).fill(''));
             setCurrentStep(0);
-            setIsSurveyStarted(false);
+            // setIsSurveyStarted(false);
         } catch (error) {
             console.error('Error saving responses:', error);
+        }
+    };
+
+    const handleNext = () => {
+        shouldConfirmExit.current = true;
+        if (currentStep < questions?.length - 1) {
+            if (
+                (questions[currentStep]?.type === 'checkbox' && selectedItems.length === 0) ||
+                (questions[currentStep]?.type !== 'checkbox' && !selectedItem) // Check selectedItem instead of answers
+            ) {
+                console.log('Please choose an option');
+            } else {
+                const updatedResponses = [...responses];
+                updatedResponses[currentStep] = {
+                    question: questions[currentStep]?.text,
+                    response: questions[currentStep]?.type === 'checkbox'
+                        ? selectedItems
+                        : selectedItem, // Use selectedItem instead of answers[currentStep]
+                };
+                setResponses(updatedResponses);
+                setCurrentStep(currentStep + 1);
+                setSelectedItem(null); // Reset selectedItem when moving to the next question
+            }
         }
     };
 
     const handlePrev = () => {
         if (currentStep > 0) {
             setCurrentStep(currentStep - 1);
+            setSelectedItem(null); // Reset selectedItem when moving to the previous question
         }
     };
 
-    const handleChange = (e) => {
-        const updatedAnswers = [...answers];
-        updatedAnswers[currentStep] = e.target.value;
-        setAnswers(updatedAnswers);
+    // const handleChange = (e) => {
+    //     const updatedAnswers = [...answers];
+    //     updatedAnswers[currentStep] = e.target.value;
+    //     setAnswers(updatedAnswers);
+    // };
+
+    // const handleCheckboxChange = (value) => {
+    //     if (selectedItems.includes(value)) {
+    //         setSelectedItems(selectedItems.filter((item) => item !== value));
+    //     } else {
+    //         setSelectedItems([...selectedItems, value]);
+    //     }
+    // };
+    const handleRadioChange = (value) => {
+        setSelectedItem(value);
     };
 
-    const handleCheckboxChange = (value) => {
-        if (selectedItems.includes(value)) {
-            setSelectedItems(selectedItems.filter((item) => item !== value));
-        } else {
-            setSelectedItems([...selectedItems, value]);
-        }
-    };
 
     return (
         <View style={styles.container}>
-            <Image source={bg1} style={styles.backgroundImage} />
+            {/* <Image source={bg1} style={styles.backgroundImage} /> */}
 
             <View style={styles.overlay}>
                 <Text style={styles.title}>Mind and Well-Being Assessment Survey</Text>
 
-                {/* Your survey components */}
+                {/* Survey content */}
                 <View style={styles.surveyContainer}>
                     {questions.length > 0 && (
                         <>
@@ -130,20 +139,23 @@ const SurveyPage = () => {
                                 <TouchableOpacity
                                     key={item}
                                     style={styles.optionContainer}
-                                    onPress={
-                                        questions[currentStep]?.type === 'checkbox'
-                                            ? () => handleCheckboxChange(item)
-                                            : () => { } // Handle radio button change
-                                    }
+                                    onPress={() => handleRadioChange(item)}
                                 >
-                                    {/* Simulated radio button or checkbox */}
-                                    {/* Implement your checkbox or radio button UI here */}
-                                    <Text style={styles.optionText}>{item}</Text>
+                                    <View style={styles.radioContainer}>
+                                        <View
+                                            style={[
+                                                styles.radio,
+                                                selectedItem === item && styles.checkedRadio,
+                                            ]}
+                                        />
+                                        <Text style={styles.optionText}>{item}</Text>
+                                    </View>
                                 </TouchableOpacity>
                             ))}
                         </>
                     )}
 
+                    {/* Buttons for navigation */}
                     <View style={styles.buttonContainer}>
                         {currentStep > 0 && (
                             <TouchableOpacity style={styles.button} onPress={handlePrev}>
@@ -167,19 +179,21 @@ const SurveyPage = () => {
     );
 };
 
-// Separate Stylesheet
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#A0BFE0',
+
     },
     backgroundImage: {
         flex: 1,
         resizeMode: 'cover',
+        width: "100%"
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        justifyContent: 'center',
+        top: 25,
+        // justifyContent: 'center',
         alignItems: 'center',
     },
     title: {
@@ -187,14 +201,16 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
         marginBottom: 20,
+        textAlign: "center"
     },
     surveyContainer: {
-        backgroundColor: 'white',
+        backgroundColor: '#C5DFF8',
         borderRadius: 10,
         padding: 16,
         width: '70%',
         height: '50%',
         justifyContent: 'center',
+        top: 25,
     },
     questionText: {
         fontSize: 18,
@@ -215,14 +231,45 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     button: {
-        backgroundColor: 'blue',
+        flex: 1, // Make both buttons occupy equal space
+        backgroundColor: '#7895CB',
         padding: 10,
         borderRadius: 5,
         marginHorizontal: 5,
+        justifyContent: 'center', // Align text horizontally and vertically
+        alignItems: 'center',
     },
     buttonText: {
         color: 'white',
     },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    checkbox: {
+        width: 20,
+        height: 20,
+        borderWidth: 1,
+        borderColor: 'black',
+        borderRadius: 3,
+        marginRight: 10,
+    },
+
+    radioContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    radio: {
+        width: 20,
+        height: 20,
+        borderWidth: 1,
+        borderColor: 'black',
+        borderRadius: 10,
+        marginRight: 10,
+    },
+    checkedRadio: {
+        backgroundColor: '#7895CB', // Customize the color when selected
+    },
 });
 
-export default SurveyPage
+export default SurveyPage;
