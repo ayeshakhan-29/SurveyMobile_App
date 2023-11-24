@@ -13,18 +13,13 @@ import Toast from 'react-native-toast-message';
 const Stack = createNativeStackNavigator();
 
 function App() {
-  // Simulate user authentication (you should replace this with your actual authentication logic)
-  const isAuthenticated = /* Check if the user is authenticated */ true;
-
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SignupPage">
         <Stack.Screen name="Home" component={Home}/>
         <Stack.Screen
           name="SurveyPage" 
-          component={SurveyPage}
-          // component={isAuthenticated ? SurveyScreen : LoginScreen}
-        />
+          component={SurveyPage}        />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="SignupPage" component={SignupScreen} />
         <Stack.Screen name="FirstPage" component={FirstPage} />
