@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import bg1 from '../Images/blue.png';
 import { getAuth } from 'firebase/auth';
 import { db } from '../Firebase/Firebase';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import Toast from 'react-native-toast-message';
+import { useNavigation } from '@react-navigation/native';
 
 const SurveyPage = () => {
     const auth = getAuth(); // Initialize Firebase Auth
     const user = auth.currentUser; // Get the current authenticated user
     // Use the appropriate navigation hook for React Native navigation
     // For instance, if you're using React Navigation:
-    // const navigation = useNavigation();
+    const navigation = useNavigation();
 
     const [selectedItems, setSelectedItems] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
@@ -64,7 +64,7 @@ const SurveyPage = () => {
             const responseRef = collection(db, 'responses');
             await addDoc(responseRef, userData);
             console.log('Survey submitted successfully!');
-
+            navigation.navigate('LogoutScreen');
             // You can also reset the state after saving
             setResponses([]);
             setAnswers(new Array(questions.length).fill(''));

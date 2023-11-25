@@ -34,7 +34,7 @@ const Signup = () => {
             // toast.success('Signup successful!');
 
             // Navigate to the login page
-            navigation.navigate('Login'); // Navigate to the 'SurveyPage'
+            navigation.navigate('Login');
 
         } catch (error) {
             console.error('Error signing up:', error);
