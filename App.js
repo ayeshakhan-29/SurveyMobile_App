@@ -26,6 +26,7 @@ function App() {
         {/* <Stack.Screen name="FirstPage" component={FirstPage} /> */}
         <Stack.Screen name="LogoutScreen" component={LogoutScreen} />
       </Stack.Navigator>
+      <Toast topOffset={50} />
     </NavigationContainer>
   );
 }

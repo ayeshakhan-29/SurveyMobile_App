@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions } from 'react-native'; // Import Dimensions
 import { getAuth } from 'firebase/auth';
 import { db } from '../Firebase/Firebase';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
@@ -12,6 +12,7 @@ const SurveyPage = () => {
     // Use the appropriate navigation hook for React Native navigation
     // For instance, if you're using React Navigation:
     const navigation = useNavigation();
+    const [surveyHeight, setSurveyHeight] = useState(Dimensions.get('window').height * 0.6);
 
     const [selectedItems, setSelectedItems] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
@@ -40,6 +41,25 @@ const SurveyPage = () => {
         }
     };
 
+    const showToast = () => {
+        Toast.show({
+            type: 'error',
+            text1: 'Please select an option',
+            visibilityTime: 4000, // Set the duration in milliseconds (3 seconds in this example)
+
+        });
+    }
+
+    const showToast1 = () => {
+        Toast.show({
+            type: 'success',
+            text1: 'Survey submitted successfully',
+            visibilityTime: 4000, // Set the duration in milliseconds (3 seconds in this example)
+
+        });
+    }
+
+
     const handleSubmit = async () => {
         shouldConfirmExit.current = false;
         const updatedResponses = [...responses];
@@ -64,6 +84,7 @@ const SurveyPage = () => {
             const responseRef = collection(db, 'responses');
             await addDoc(responseRef, userData);
             console.log('Survey submitted successfully!');
+            showToast1();
             navigation.navigate('LogoutScreen');
             // You can also reset the state after saving
             setResponses([]);
@@ -83,6 +104,7 @@ const SurveyPage = () => {
                 (questions[currentStep]?.type !== 'checkbox' && !selectedItem) // Check selectedItem instead of answers
             ) {
                 console.log('Please choose an option');
+                showToast();
             } else {
                 const updatedResponses = [...responses];
                 updatedResponses[currentStep] = {
@@ -105,19 +127,6 @@ const SurveyPage = () => {
         }
     };
 
-    // const handleChange = (e) => {
-    //     const updatedAnswers = [...answers];
-    //     updatedAnswers[currentStep] = e.target.value;
-    //     setAnswers(updatedAnswers);
-    // };
-
-    // const handleCheckboxChange = (value) => {
-    //     if (selectedItems.includes(value)) {
-    //         setSelectedItems(selectedItems.filter((item) => item !== value));
-    //     } else {
-    //         setSelectedItems([...selectedItems, value]);
-    //     }
-    // };
     const handleRadioChange = (value) => {
         setSelectedItem(value);
     };
@@ -131,27 +140,31 @@ const SurveyPage = () => {
                 <Text style={styles.title}>Mind and Well-Being Assessment Survey</Text>
 
                 {/* Survey content */}
-                <View style={styles.surveyContainer}>
+                <View style={[styles.surveyContainer, { height: surveyHeight }]}>
                     {questions.length > 0 && (
                         <>
-                            <Text style={styles.questionText}>{questions[currentStep]?.text}</Text>
-                            {questions[currentStep]?.options.map((item) => (
-                                <TouchableOpacity
-                                    key={item}
-                                    style={styles.optionContainer}
-                                    onPress={() => handleRadioChange(item)}
-                                >
-                                    <View style={styles.radioContainer}>
-                                        <View
-                                            style={[
-                                                styles.radio,
-                                                selectedItem === item && styles.checkedRadio,
-                                            ]}
-                                        />
-                                        <Text style={styles.optionText}>{item}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
+                            <ScrollView contentContainerStyle={styles.scrollContent}>
+
+                                <Text style={styles.questionText}>{questions[currentStep]?.text}</Text>
+                                {questions[currentStep]?.options.map((item) => (
+                                    <TouchableOpacity
+                                        key={item}
+                                        style={styles.optionContainer}
+                                        onPress={() => handleRadioChange(item)}
+                                    >
+                                        <View style={styles.radioContainer}>
+                                            <View
+                                                style={[
+                                                    styles.radio,
+                                                    selectedItem === item && styles.checkedRadio,
+                                                ]}
+                                            />
+                                            <Text style={styles.optionText}>{item}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+
                         </>
                     )}
 
@@ -183,13 +196,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#A0BFE0',
+        minHeight: "130%",
+        overflow: 'hidden',
+        marginBottom: 10,
 
     },
-    backgroundImage: {
-        flex: 1,
-        resizeMode: 'cover',
-        width: "100%"
-    },
+
     overlay: {
         ...StyleSheet.absoluteFillObject,
         top: 25,
@@ -200,6 +212,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: 'white',
+        marginTop: 20,
         marginBottom: 20,
         textAlign: "center"
     },
@@ -207,15 +220,27 @@ const styles = StyleSheet.create({
         backgroundColor: '#C5DFF8',
         borderRadius: 10,
         padding: 16,
-        width: '70%',
-        height: '50%',
-        justifyContent: 'center',
+        // justifyContent: 'center',
         top: 25,
+        overflow: 'hidden', // Ensure text doesn't overflow the container
+        width: "80%",
+        height: "50%",
+        maxHeight: "80%",
+        marginHorizontal: 20,
+
+    },
+    scrollContent: {
+        // justifyContent: 'center',
+        minHeight: "70%",
+        paddingTop: 10,
+        paddingBottom: 50,
     },
     questionText: {
-        fontSize: 18,
-        marginBottom: 10,
+        fontSize: 22,
+        marginBottom: 20,
         color: 'black',
+        maxWidth: '90%', // Limit text width to prevent overflow
+        // alignSelf: 'center', // Center text
     },
     optionContainer: {
         flexDirection: 'row',

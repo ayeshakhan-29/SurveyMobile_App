@@ -12,6 +12,14 @@ const Signup = () => {
 
     const navigation = useNavigation(); // Initialize navigation object
 
+    const showToast = (type, text) => {
+        Toast.show({
+            type: type,
+            text1: text,
+            visibilityTime: 4000,
+        });
+    };
+
     const handleSignup = async () => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -20,6 +28,7 @@ const Signup = () => {
             });
 
             console.log('User signed up:', userCredential.user);
+            showToast('success', 'You have registered successfully');
 
             // Save user data to Firestore with a unique identifier (UID)
             const userDocRef = doc(db, 'users', userCredential.user.uid);
@@ -114,7 +123,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     signupButton: {
-        backgroundColor: 'green',
+        backgroundColor: '#68B984',
         width: '100%',
         padding: 12,
         borderRadius: 6,
@@ -127,7 +136,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     loginLink: {
-        color: 'blue',
+        color: '#5FBDFF',
     },
 });
 

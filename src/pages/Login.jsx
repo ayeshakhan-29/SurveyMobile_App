@@ -3,34 +3,46 @@ import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../Firebase/Firebase'
+import Toast from 'react-native-toast-message';
 
 const LoginScreen = () => {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+
+    const showToast = (type, text) => {
+        Toast.show({
+            type: type,
+            text1: text,
+            visibilityTime: 4000,
+        });
+    };
+
     const handleLogin = async () => {
         try {
             if (!validateEmail(email)) {
                 // Show error message for invalid email format
                 console.error('Invalid email format');
+                showToast('error', 'Invalid email format');
                 return;
             }
 
             if (!validatePassword(password)) {
                 // Show error message for invalid password
                 console.error('Password must be at least 6 characters');
+                showToast('error', 'Password must be at least 6 characters');
                 return;
             }
 
             // Perform Firebase authentication (Replace with your authentication method)
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-
+            showToast('success', 'You are logged in successfully');
             // Redirect to Home page with user's display name
             navigation.navigate('Home', { name: user.displayName });
         } catch (error) {
-            handleLoginError(error); // Pass the error object directly
+            handleLoginError(error.code); // Pass the error object directly
         }
     };
 
@@ -48,26 +60,21 @@ const LoginScreen = () => {
         switch (errorCode) {
             case 'auth/invalid-email':
                 console.error('Invalid email format');
-                // Show error message for invalid email format
-                // Example: toast.error('Invalid email format');
+                showToast('error', 'Invalid email format');
                 break;
             case 'auth/wrong-password':
                 console.error('Invalid password');
-                // Show error message for invalid password
-                // Example: toast.error('Invalid password');
+                showToast('error', 'Incorrect password');
                 break;
             case 'auth/user-not-found':
                 console.error('User not found');
-                // Show error message for user not found
-                // Example: toast.error('User not found');
+                showToast('error', 'User not found');
                 break;
             default:
                 console.error('Error logging in:', errorCode);
-            // Show a generic error message for other login errors
-            // Example: toast.error('Error logging in');
+                showToast('error', 'Error logging in');
         }
     };
-
 
     return (
         <View style={styles.container}>
@@ -90,7 +97,7 @@ const LoginScreen = () => {
                     <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('Signup')} // Replace 'Signup' with your signup screen name
+                    onPress={() => navigation.navigate('SignupPage')} // Replace 'Signup' with your signup screen name
                 >
                     <Text style={styles.signupButton}>Signup</Text>
                 </TouchableOpacity>
