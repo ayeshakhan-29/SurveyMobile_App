@@ -4,13 +4,14 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, db } from '../Firebase/Firebase';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook from React Navigation
 import { doc, setDoc } from 'firebase/firestore';
+import Toast from 'react-native-toast-message';
 
 const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
 
-    const navigation = useNavigation(); // Initialize navigation object
+    const navigation = useNavigation();
 
     const showToast = (type, text) => {
         Toast.show({
@@ -22,6 +23,18 @@ const Signup = () => {
 
     const handleSignup = async () => {
         try {
+            if (!validateEmail(email)) {
+                console.error('Invalid email format');
+                showToast('error', 'Invalid email format');
+                return;
+            }
+            if (!validatePassword(password)) {
+                // Show error message for invalid password
+                console.error('Password must be at least 6 characters');
+                showToast('error', 'Password must be at least 6 characters');
+                return;
+            }
+
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, {
                 displayName: displayName,
@@ -30,7 +43,6 @@ const Signup = () => {
             console.log('User signed up:', userCredential.user);
             showToast('success', 'You have registered successfully');
 
-            // Save user data to Firestore with a unique identifier (UID)
             const userDocRef = doc(db, 'users', userCredential.user.uid);
             await setDoc(userDocRef, {
                 email: email,
@@ -38,25 +50,25 @@ const Signup = () => {
             });
 
             console.log('User data saved to Firestore');
-
-            // Show a success toast message
-            // toast.success('Signup successful!');
-
-            // Navigate to the login page
             navigation.navigate('Login');
-
         } catch (error) {
             console.error('Error signing up:', error);
-
-            // Show a failure toast message
-            // toast.error('Signup failed. Please try again.');
+            showToast('error', 'Sign up failed');
         }
+    };
+
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        return password.length >= 6;
     };
 
     const handleLoginNavigation = () => {
         navigation.navigate('Login');
     };
-
 
     return (
         <View style={styles.container}>
@@ -94,7 +106,6 @@ const Signup = () => {
         </View>
     );
 };
-
 // Separate Stylesheet
 const styles = StyleSheet.create({
     container: {
